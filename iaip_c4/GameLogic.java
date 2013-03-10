@@ -73,22 +73,26 @@ public class GameLogic implements IGameLogic {
             board[column][free] = playerID;
             //System.out.println("user " + playerID + " inserted at column: " + column + " at row:" + free);
         }
-        else System.out.println("column is full");
+        else System.out.println("column is full - column: " + column + " row: " + free);
     }
 
     public int decideNextMove() {
         //TODO Write your implementation for this method
-        counter = 15;
+        counter = 4;
 
         Integer[] columns = getFreeColumns();
-        
+        System.out.println("decideNextMove");
+        for (int i : columns) {
+                System.out.print(i +" ");
+            }
         int bestAction = -1;
 
         if (playerID == max) { //PLayer is MAX
             int v = Integer.MIN_VALUE;
             for(int i = 0; i < columns.length; i++) {
                 GameLogic otherPlayer = this.createOther(x,y,min); //Ny spiller
-                otherPlayer.insertCoin(i,max); //Opdater spilleplade 
+                otherPlayer.insertCoin(columns[i],max); //Opdater spilleplade 
+                System.out.print("max action: " + columns[i] + " ");
                 int currentMin = otherPlayer.minValue();
                 if (currentMin >= v) {
                     v = currentMin;
@@ -96,12 +100,13 @@ public class GameLogic implements IGameLogic {
                 }
 
             }
-    
+        System.out.println();
         } else { //Player is MIN
             int v = Integer.MAX_VALUE;
             for(int i = 0; i < columns.length; i++) {
                 GameLogic otherPlayer = this.createOther(x,y,max); //Ny spiller
-                otherPlayer.insertCoin(i,min); //Opdater spilleplade 
+                otherPlayer.insertCoin(columns[i],min); //Opdater spilleplade 
+                System.out.print("min action: " + columns[i] + " ");
                 int currentMax = otherPlayer.maxValue();
                 if (currentMax <= v) {
                     v = currentMax;
@@ -111,7 +116,8 @@ public class GameLogic implements IGameLogic {
             }
         
         }
-
+        if (bestAction <0)
+            System.out.println("FEJL!!!");
         return bestAction;
     }
 
@@ -119,6 +125,10 @@ public class GameLogic implements IGameLogic {
     public int maxValue() {
         if (terminalTest()) return utility();
         Integer[] columns = getFreeColumns();
+        System.out.println("maxValue");
+        for (int i : columns) {
+                System.out.print(i +" ");
+            }
         int v = Integer.MIN_VALUE;
         for(int i : columns) {
             GameLogic otherPlayer = this.createOther(x,y,min); //Ny spiller
@@ -133,7 +143,12 @@ public class GameLogic implements IGameLogic {
 
     public int minValue() {
         if (terminalTest()) return utility();
+
         Integer[] columns = getFreeColumns();
+        System.out.println("minValue");
+        for (int i : columns) {
+                System.out.print(i +" ");
+            }
         int v = Integer.MAX_VALUE;
         for(int i : columns) {
             GameLogic otherPlayer = this.createOther(x,y,max); //Ny spiller
@@ -158,18 +173,22 @@ public class GameLogic implements IGameLogic {
         while(board[column][i]!=0) {
             i++;
             if(i >= board[column].length) return -1;
+            
         }
         return i;
     }
 
     public boolean terminalTest() {
         counter -= 1;
+        if (getFreeColumns().length < 0)
+            return true;
         if (counter <= 0) {
             //System.out.println("terminated.");
             //printBoard();
             return true;
         }
         else return false;
+
 
     }
 
