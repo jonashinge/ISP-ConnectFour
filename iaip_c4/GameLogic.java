@@ -44,7 +44,7 @@ public class GameLogic implements IGameLogic {
 
         if(columns != null && columns.length>0) {
             int r = (int)(Math.random()*columns.length-1);
-            return r;
+            return columns[r];
         }
         return -1;
     }
@@ -55,7 +55,7 @@ public class GameLogic implements IGameLogic {
         ArrayList<Integer> columns = new ArrayList<Integer>();
         for(int i=0; i<board.length; i++) {
             if(getFreeRow(i) != -1)
-                columns.add(getFreeRow(i));
+                columns.add(i);
         }
         return columns.toArray(new Integer[columns.size()]);
     }
