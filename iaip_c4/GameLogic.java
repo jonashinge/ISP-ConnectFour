@@ -78,7 +78,7 @@ public class GameLogic implements IGameLogic {
 
     public int decideNextMove() {
         //TODO Write your implementation for this method
-        counter = 40;
+        counter = 10;
 
         Integer[] columns = getFreeColumns();
         //System.out.println("decideNextMove");
@@ -101,7 +101,8 @@ public class GameLogic implements IGameLogic {
                 if (currentMin > v) {
                     v = currentMin;
                     bestAction = columns[i];
-                } else if (currentMin == v && (int)Math.random() == 1) {
+                } else if (currentMin == v && Math.random() >=0.5d) {
+                    System.out.println("random");
                     v = currentMin;
                     bestAction = columns[i];
 
@@ -122,7 +123,8 @@ public class GameLogic implements IGameLogic {
                 if (currentMax < v) {
                     v = currentMax;
                     bestAction = columns[i];
-                } else if (currentMax == v && ((int)Math.random()) == 1) {
+                } else if (currentMax == v && Math.random() >=0.5d) {
+                    System.out.println("random");
                     v = currentMax;
                     bestAction = columns[i];
 
