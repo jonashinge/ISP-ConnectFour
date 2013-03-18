@@ -49,6 +49,9 @@ public class GameLogic implements IGameLogic {
         this.playerID = playerID;
         //TODO Write your implementation for this method
         board = new int[x][y];
+
+        /*Node node = new Node(0,0,3);
+        horizontal.add(node);*/
     }
 	
     public Winner gameFinished() {
@@ -56,6 +59,18 @@ public class GameLogic implements IGameLogic {
         System.out.println("Game gameFinished");
 
         Integer[] columns = getFreeColumns();
+
+        // test print datastructure
+        for(Node n : horizontal) {
+            
+            System.out.print("x:" + n.x + " y:" + n.y + " playerid:" + n.playerID + ", ");
+
+            while(n.getNext() != null) {
+                System.out.print("x:" + n.getNext().x + " y:" + n.getNext().y + " playerid:" + n.getNext().playerID + ", ");
+                n = n.getNext();
+            }
+            System.out.println();
+        }
 
         if(columns != null && columns.length>0) {
             printBoard();
@@ -97,25 +112,36 @@ public class GameLogic implements IGameLogic {
 
     public void insertHorizontal(int column,int row, int playerID) {
         Node n = new Node(column,row,playerID);
+        boolean inserted = false;
 
         for (Node node : horizontal) {
             if (node.y == row) {
                 Node tempNode = node;
-                while (tempNode.getNext() != null) {
-                    if (tempNode.x == column-1) {
-                        tempNode.setNext(n);                        
+                while (true) {
+                    if (tempNode.x == column-1 && tempNode.playerID == playerID) {
+                        System.out.println("setting next node x: " + n.x + " y:" + n.y);
+                        tempNode.setNext(n); 
+                        inserted = true;                  
+                        break;
                     }
                     tempNode=tempNode.getNext();
+                    if(tempNode==null) {
+                        break;
+                    }
                 }
             }
         }
+
+        if (inserted==false)
+            horizontal.add(n);
+
 
         Iterator<Node> i = horizontal.iterator();
         
 
         while (i.hasNext()) {
             Node iNode = i.next();
-            if (iNode.y == n.y && iNode.x == n.x+1) {
+            if (iNode.y == n.y && iNode.x == n.x+1 && iNode.playerID == playerID) {
                 n.setNext(iNode);
                 i.remove();
             }
@@ -129,7 +155,7 @@ public class GameLogic implements IGameLogic {
             if (columnNode.x == column - 1 ) {
                 Node tempNode = columnNode;
                 while (tempNode.getNext() != null) {
-                    if (tempNode.y == row-1) {
+                    if (tempNode.y == row-1 && tempNode.playerID == playerID) {
                         tempNode.setNext(n);                        
                     }
                     tempNode=tempNode.getNext();
@@ -144,7 +170,7 @@ public class GameLogic implements IGameLogic {
 
         while (i.hasNext()) {
             Node iNode = i.next();
-            if (iNode.y == n.y+1 && iNode.x == n.x+1) {
+            if (iNode.y == n.y+1 && iNode.x == n.x+1 && iNode.playerID == playerID) {
                 n.setNext(iNode);
                 i.remove();
             }
@@ -158,7 +184,7 @@ public class GameLogic implements IGameLogic {
             if (columnNode.x == column + 1 ) {
                 Node tempNode = columnNode;
                 while (tempNode.getNext() != null) {
-                    if (tempNode.y == row-1) {
+                    if (tempNode.y == row-1 && tempNode.playerID == playerID) {
                         tempNode.setNext(n);                        
                     }
                     tempNode=tempNode.getNext();
@@ -172,7 +198,7 @@ public class GameLogic implements IGameLogic {
 
         while (i.hasNext()) {
             Node iNode = i.next();
-            if (iNode.y == n.y+1 && iNode.x == n.x-1) {
+            if (iNode.y == n.y+1 && iNode.x == n.x-1 && iNode.playerID == playerID) {
                 n.setNext(iNode);
                 i.remove();
             }
