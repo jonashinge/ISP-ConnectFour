@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.*;
 
 public class GameLogic implements IGameLogic {
     private int x = 0;
@@ -9,6 +10,12 @@ public class GameLogic implements IGameLogic {
     private int[][] board;
     private int counter;
     
+    private ArrayList<Node> vertical = new ArrayList<Node>();
+    private ArrayList<Node> horizontal = new ArrayList<Node>();
+    private ArrayList<Node> rightDiagonal = new ArrayList<Node>();
+    private ArrayList<Node> leftDiagonal = new ArrayList<Node>();
+
+
 
     public GameLogic() {
         //TODO Write your implementation for this method
@@ -49,6 +56,7 @@ public class GameLogic implements IGameLogic {
         System.out.println("Game gameFinished");
 
         Integer[] columns = getFreeColumns();
+
         if(columns != null && columns.length>0) {
             printBoard();
             System.out.println("NOT NOT_FINISHED");
@@ -66,16 +74,154 @@ public class GameLogic implements IGameLogic {
         
     }
 
+    
+
+
+    public void insertVertical(int column, int row, int playerID) {
+        Node n = new Node(column,row,playerID);
+        if ( row == 0 ) {
+            vertical.add(n);
+        } else {
+            for (Node node : vertical) {
+                Node tempNode = node;
+                while (tempNode.getNext() != null) {
+                    if (tempNode.playerID == playerID && tempNode.x == column && tempNode.y == row-1) {
+                        tempNode.setNext(n);     
+                        break;               
+                    }
+                    tempNode = tempNode.getNext();
+                }
+            }
+        }
+    }
+
+    public void insertHorizontal(int column,int row, int playerID) {
+        Node n = new Node(column,row,playerID);
+
+        for (Node node : horizontal) {
+            if (node.y == row) {
+                Node tempNode = node;
+                while (tempNode.getNext() != null) {
+                    if (tempNode.x == column-1) {
+                        tempNode.setNext(n);                        
+                    }
+                    tempNode=tempNode.getNext();
+                }
+            }
+        }
+
+        Iterator<Node> i = horizontal.iterator();
+        
+
+        while (i.hasNext()) {
+            Node iNode = i.next();
+            if (iNode.y == n.y && iNode.x == n.x+1) {
+                n.setNext(iNode);
+                i.remove();
+            }
+            }
+        }
+
+        public void insertRightDiagonal(int column,int row, int playerID) {
+        Node n = new Node(column,row,playerID);
+
+        for (Node columnNode : rightDiagonal) {
+            if (columnNode.x == column - 1 ) {
+                Node tempNode = columnNode;
+                while (tempNode.getNext() != null) {
+                    if (tempNode.y == row-1) {
+                        tempNode.setNext(n);                        
+                    }
+                    tempNode=tempNode.getNext();
+                }
+            }
+
+        }
+        
+
+        Iterator<Node> i = rightDiagonal.iterator();
+        
+
+        while (i.hasNext()) {
+            Node iNode = i.next();
+            if (iNode.y == n.y+1 && iNode.x == n.x+1) {
+                n.setNext(iNode);
+                i.remove();
+            }
+            }
+    }
+
+     public void insertLeftDiagonal(int column,int row, int playerID) {
+        Node n = new Node(column,row,playerID);
+
+        for (Node columnNode : leftDiagonal) {
+            if (columnNode.x == column + 1 ) {
+                Node tempNode = columnNode;
+                while (tempNode.getNext() != null) {
+                    if (tempNode.y == row-1) {
+                        tempNode.setNext(n);                        
+                    }
+                    tempNode=tempNode.getNext();
+                }
+            }
+
+        }
+        
+        Iterator<Node> i = rightDiagonal.iterator();
+        
+
+        while (i.hasNext()) {
+            Node iNode = i.next();
+            if (iNode.y == n.y+1 && iNode.x == n.x-1) {
+                n.setNext(iNode);
+                i.remove();
+            }
+            }
+        
+    }
+
+    
+
+    /*      if (column != 0 || column != board.length -1) {
+            
+        }
+
+                while (i.hasNext()) {
+            Node iNode = i.next();
+
+            while (j.hasNext()) {
+                Node jNode = j.next();
+
+                if (iNode.y == jNode.y) {
+                    
+                    if (iNode.x == jNode.x-1 && iNode.playerID == jNode.playerID) {
+                        iNode.setNext(jNode);
+                        j.remove();
+                    } else {
+                        
+                    }
+
+                jNode= j.next();
+                }
+            }
+        }
+    */
 
     public void insertCoin(int column, int playerID) {
         //TODO Write your implementation for this method
         int free = getFreeRow(column);
         if(free != -1) {
             board[column][free] = playerID;
+            insertHorizontal(column,free,playerID);
+            insertVertical(column,free,playerID);
+            insertLeftDiagonal(column,free,playerID);
+            insertRightDiagonal(column,free,playerID);
             //System.out.println("user " + playerID + " inserted at column: " + column + " at row:" + free);
         }
         else System.out.println("column is full - column: " + column + " row: " + free);
     }
+
+
 
     public int decideNextMove() {
         //TODO Write your implementation for this method
@@ -206,8 +352,10 @@ public class GameLogic implements IGameLogic {
 
     public boolean terminalTest() {
         counter -= 1;
+
         if (getFreeColumns().length <= 0)
             return true;
+        
         if (counter <= 0) {
             //System.out.println("terminated.");
             //printBoard();
