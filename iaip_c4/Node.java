@@ -1,6 +1,6 @@
 
 
-public class Node {
+public class Node implements Cloneable {
 	private Node next;
 	public int x;
 	public int y;
@@ -18,6 +18,10 @@ public class Node {
 		this.x = x;
 		this.y = y;
 		this.playerID = playerID;
+	}
+
+	public Object clone() {
+		return (Object) new Node(x,y,playerID);
 	}
 }
 

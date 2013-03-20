@@ -6,8 +6,9 @@ public class LineHelper {
         Node n = new Node(column,row,playerID);
         boolean inserted = false;
 
-        if ( row == 0 ) {
+       if ( row == 0 ) {
             vertical.add(n);
+            inserted=true;
         } else {
             for (Node node : vertical) {
                 Node tempNode = node;
