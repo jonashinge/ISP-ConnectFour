@@ -68,6 +68,10 @@ public class GameLogic implements IGameLogic {
         printDataStructure(rightDiagonal);
         System.out.println();
 
+        System.out.println("Left diagonal:");
+        printDataStructure(leftDiagonal);
+        System.out.println();
+
         if(columns != null && columns.length>0) {
             printBoard();
             System.out.println();
@@ -196,19 +200,27 @@ public class GameLogic implements IGameLogic {
 
      public void insertLeftDiagonal(int column,int row, int playerID) {
         Node n = new Node(column,row,playerID);
+        boolean inserted = false;
 
         for (Node columnNode : leftDiagonal) {
-            if (columnNode.x == column + 1 ) {
+            //if (columnNode.x == column + 1 ) {
                 Node tempNode = columnNode;
-                while (tempNode.getNext() != null) {
-                    if (tempNode.y == row-1 && tempNode.playerID == playerID) {
+                while (true) {
+                    if (tempNode.y == row-1 && tempNode.x == column+1 &&tempNode.playerID == playerID) {
                         tempNode.setNext(n);                        
+                        inserted = true;
+                        break;
                     }
                     tempNode=tempNode.getNext();
+                    if(tempNode==null)
+                        break;
                 }
-            }
+            //}
 
         }
+
+        if(inserted==false)
+            leftDiagonal.add(n);
         
         Iterator<Node> i = rightDiagonal.iterator();
         
