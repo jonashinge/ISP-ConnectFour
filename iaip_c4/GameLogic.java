@@ -5,8 +5,8 @@ public class GameLogic implements IGameLogic {
     private int x = 0;
     private int y = 0;
     private int playerID;
-    private int max = 2;
     private int min = 1;
+    private int max = 2;
     private int[][] board;
     private int counter;
     
@@ -41,7 +41,7 @@ public class GameLogic implements IGameLogic {
     
 
     public GameLogic createOther(int x, int y, int playerID) {
-        return new GameLogic(x,  y,  playerID, this.board,this.counter);
+        return new GameLogic(x,  y, playerID , this.board,this.counter);
     }
 	
     public void initializeGame(int x, int y, int playerID) {
@@ -62,7 +62,7 @@ public class GameLogic implements IGameLogic {
         Integer[] columns = getFreeColumns();
 
         // test print datastructure
-        System.out.println("Horizontal:");
+       /* System.out.println("Horizontal:");
         printDataStructure(horizontal);
         System.out.println();
 
@@ -78,7 +78,7 @@ public class GameLogic implements IGameLogic {
         printDataStructure(leftDiagonal);
         System.out.println();
 
-        
+        */
         
         for (ArrayList<Node> list : lists ) {
             Winner result = LineHelper.finalLineExistsIn(list);
@@ -226,7 +226,7 @@ public class GameLogic implements IGameLogic {
         int v = Integer.MIN_VALUE;
 
         for(int i : columns) {
-            GameLogic otherPlayer = this.createOther(x,y,min); //Ny spiller
+            GameLogic otherPlayer = this.createOther(x,y,max); //Ny spiller
             otherPlayer.insertCoin(i,max); //Opdater spilleplade 
             v = Math.max(otherPlayer.minValue(),v);
         }
@@ -243,7 +243,7 @@ public class GameLogic implements IGameLogic {
         int v = Integer.MAX_VALUE;
 
         for(int i : columns) {
-            GameLogic otherPlayer = this.createOther(x,y,max); //Ny spiller
+            GameLogic otherPlayer = this.createOther(x,y,min); //Ny spiller
             otherPlayer.insertCoin(i,min); //Opdater spilleplade 
             v = Math.min(otherPlayer.maxValue(),v);
         }
@@ -274,44 +274,58 @@ public class GameLogic implements IGameLogic {
     public boolean terminalTest() {
         counter -= 1;
 
-        if (getFreeColumns().length <= 0)
-            return true;
-        
         if (counter <= 0) {
             return true;
-        }
+        } else if (getFreeColumns().length <= 0)
+            return true;
+
         else return false;
 
 
     }
 
     public int utility() {
+        
+        /*System.out.println(playerID);
+        return 1;*/
         Integer[] columns = getFreeColumns();
         int[] utilities = new int[columns.length];
         int utility = 0;
 
         for (int x = 0; x < columns.length; x++) {
             int y = getFreeRow(x);
-            utilities[x] = Math.max(horizontalUtility(x,y),utilities[x]);
+            utilities[x] += Math.max(horizontalUtility(x,y),utilities[x]);
+            //System.out.println("utilities[" + x + "] : " + utilities[x]  );
         }
         for (int i = 0; i < utilities.length; i++)
             utility += utilities[i];
+        if (utility>0)
+            System.out.println("utility " + utility + "for playerID "  + playerID);
         return utility;
+
+
     }
 
     public int horizontalUtility(int x, int y) {
+    
+        
             int utility = 0;
             for(Node n : horizontal) {
             Node tempNode = n;
+           
             int partUtility = 0;
-            if (playerID == n.playerID && n.y == y){
+            
+            if (playerID == n.playerID  ){
+
             while(true) {
+               //System.out.println("playerID: " + n.playerID + " partUtility " + partUtility );
+                partUtility++;
                 if(tempNode.getNext() != null) {
                     tempNode = tempNode.getNext();
-                    partUtility++;
+                    
                     } else {
-                        if (tempNode.x != x-1)
-                            partUtility = 0;
+                        //if (tempNode.x != x-1)
+                        //    partUtility = 0;
                         utility += partUtility;
                         break;
                     }
@@ -319,8 +333,10 @@ public class GameLogic implements IGameLogic {
                 }
             }
         }
-        System.out.println("horizontalUtility x: " + x + ", y: "  + y + " u: " + utility);
+        //if (utility > 0)
+        //    System.out.println("horizontalUtility x: " + x + ", y: "  + y + " u: " + utility);
         return utility;
+        
         }
     
 
@@ -336,15 +352,16 @@ public class GameLogic implements IGameLogic {
     }
 
     public void printDataStructure(ArrayList<Node> list) {
-
+/*
         for(Node n : list) {
             System.out.print("x:" + n.x + " y:" + n.y + " playerid:" + n.playerID + ", ");
             while(n.getNext() != null) {
                 System.out.print("x:" + n.getNext().x + " y:" + n.getNext().y + " playerid:" + n.getNext().playerID + ", ");
                 n = n.getNext();
-            }
+            } 
             System.out.println();
         }
+        */
     }
 
 }

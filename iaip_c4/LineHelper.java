@@ -37,7 +37,6 @@ public class LineHelper {
                 Node tempNode = node;
                 while (true) {
                     if (tempNode.x == column-1 && tempNode.playerID == playerID) {
-                        System.out.println("setting next node x: " + n.x + " y:" + n.y);
                         tempNode.setNext(n); 
                         inserted = true;                  
                         break;
@@ -149,7 +148,7 @@ public class LineHelper {
     				size++;
     				if(size>=4) 
     					{
-                            System.out.println("finalLineExistsIn");
+                            //System.out.println("finalLineExistsIn");
                             if (tempNode.playerID == 1)
                                 return IGameLogic.Winner.PLAYER1;
                             else if ( tempNode.playerID ==2) 
