@@ -72,7 +72,19 @@ public class GameLogic implements IGameLogic {
         printDataStructure(leftDiagonal);
         System.out.println();
 
-        if(columns != null && columns.length>0) {
+        if(LineHelper.finalLineExistsIn(horizontal) ||
+                LineHelper.finalLineExistsIn(vertical) ||
+                LineHelper.finalLineExistsIn(rightDiagonal) ||
+                LineHelper.finalLineExistsIn(leftDiagonal)) {
+
+            System.out.println();
+            printBoard();
+            System.out.println();
+            System.out.println("Game status:");
+            System.out.println("WINNER");
+            return Winner.PLAYER1;
+        }
+        else if(columns != null && columns.length>0) {
             printBoard();
             System.out.println();
             System.out.println("Game status:");

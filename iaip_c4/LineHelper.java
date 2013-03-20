@@ -138,4 +138,24 @@ public class LineHelper {
             }
         
     }
+
+    public static boolean finalLineExistsIn(ArrayList<Node> list) {
+    	for(Node n : list) {
+    		int size = 1;
+    		Node tempNode = n;
+    		while(true) {
+    			if(tempNode.getNext() != null) {
+    				tempNode = tempNode.getNext();
+    				size++;
+    				if(size>=4) 
+    					return true;
+    			}
+    			else break;
+    		}
+    	}
+    	return false;
+    }
+
+
+
 }
