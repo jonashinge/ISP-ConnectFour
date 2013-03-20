@@ -139,7 +139,7 @@ public class LineHelper {
         
     }
 
-    public static boolean finalLineExistsIn(ArrayList<Node> list) {
+    public static IGameLogic.Winner finalLineExistsIn(ArrayList<Node> list) {
     	for(Node n : list) {
     		int size = 1;
     		Node tempNode = n;
@@ -148,12 +148,18 @@ public class LineHelper {
     				tempNode = tempNode.getNext();
     				size++;
     				if(size>=4) 
-    					return true;
+    					{
+                            System.out.println("finalLineExistsIn");
+                            if (tempNode.playerID == 1)
+                                return IGameLogic.Winner.PLAYER1;
+                            else if ( tempNode.playerID ==2) 
+                                return IGameLogic.Winner.PLAYER2;
+                        };
     			}
     			else break;
     		}
     	}
-    	return false;
+    	return IGameLogic.Winner.NOT_FINISHED;
     }
 
 

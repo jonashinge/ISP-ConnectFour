@@ -15,6 +15,8 @@ public class GameLogic implements IGameLogic {
     private ArrayList<Node> rightDiagonal = new ArrayList<Node>();
     private ArrayList<Node> leftDiagonal = new ArrayList<Node>();
 
+    private ArrayList<ArrayList<Node>> lists = new ArrayList<ArrayList<Node>>();
+
 
 
     public GameLogic() {
@@ -48,6 +50,10 @@ public class GameLogic implements IGameLogic {
         this.playerID = playerID;
         //TODO Write your implementation for this method
         board = new int[x][y];
+        lists.add(vertical);
+        lists.add(horizontal);
+        lists.add(rightDiagonal);
+        lists.add(leftDiagonal);
     }
 	
     public Winner gameFinished() {
@@ -72,6 +78,42 @@ public class GameLogic implements IGameLogic {
         printDataStructure(leftDiagonal);
         System.out.println();
 
+        
+        
+        for (ArrayList<Node> list : lists ) {
+            Winner result = LineHelper.finalLineExistsIn(list);
+            if (result != Winner.NOT_FINISHED && result != Winner.TIE) {
+                System.out.println();
+                printBoard();
+                System.out.println();
+                System.out.println("Game status:");
+                System.out.println("WINNER");
+                return result;
+            }
+        
+        }
+
+        if(columns != null && columns.length>0) {
+            printBoard();
+            System.out.println();
+            System.out.println("Game status:");
+            System.out.println("NOT FINISHED");
+            
+            return Winner.NOT_FINISHED;
+        }
+        else {
+            System.out.println();
+            printBoard();
+            System.out.println();
+            System.out.println("Game status:");
+            System.out.println("TIE");
+            return Winner.TIE;
+        }
+
+
+
+
+        /*
         if(LineHelper.finalLineExistsIn(horizontal) ||
                 LineHelper.finalLineExistsIn(vertical) ||
                 LineHelper.finalLineExistsIn(rightDiagonal) ||
@@ -83,6 +125,7 @@ public class GameLogic implements IGameLogic {
             System.out.println("Game status:");
             System.out.println("WINNER");
             return Winner.PLAYER1;
+
         }
         else if(columns != null && columns.length>0) {
             printBoard();
@@ -100,7 +143,7 @@ public class GameLogic implements IGameLogic {
             System.out.println("TIE");
             return Winner.TIE;
         }
-        
+        */
     }
 
     public void insertCoin(int column, int playerID) {
@@ -121,7 +164,7 @@ public class GameLogic implements IGameLogic {
 
     public int decideNextMove() {
         //TODO Write your implementation for this method
-        counter = 10;
+        counter = 5;
 
         Integer[] columns = getFreeColumns();
         
@@ -133,18 +176,18 @@ public class GameLogic implements IGameLogic {
             for(int i = 0; i < columns.length; i++) {
 
                 GameLogic otherPlayer = this.createOther(x,y,min); //Ny spiller
-                //otherPlayer.insertCoin(columns[i],max); //Opdater spilleplade 
+                otherPlayer.insertCoin(columns[i],max); //Opdater spilleplade 
                 
                  currentMin = otherPlayer.minValue();
        
                 if (currentMin > v) {
                     v = currentMin;
                     bestAction = columns[i];
-                } else if (currentMin == v && Math.random() >=0.5d) {
+                }  /* else if (currentMin == v && Math.random() >=0.5d) {
                     v = currentMin;
                     bestAction = columns[i];
 
-                }
+                }*/
 
             }
         System.out.println();
@@ -153,18 +196,18 @@ public class GameLogic implements IGameLogic {
             for(int i = 0; i < columns.length; i++) {
 
                 GameLogic otherPlayer = this.createOther(x,y,max); //Ny spiller
-                //otherPlayer.insertCoin(columns[i],min); //Opdater spilleplade 
+                otherPlayer.insertCoin(columns[i],min); //Opdater spilleplade 
                 
                 currentMax = otherPlayer.maxValue();
    
                 if (currentMax < v) {
                     v = currentMax;
                     bestAction = columns[i];
-                } else if (currentMax == v && Math.random() >=0.5d) {
+                } /*else if (currentMax == v && Math.random() >=0.5d) {
                     v = currentMax;
                     bestAction = columns[i];
 
-                }
+                }*/
 
             }
         
@@ -243,8 +286,43 @@ public class GameLogic implements IGameLogic {
     }
 
     public int utility() {
-        return 1;
+        Integer[] columns = getFreeColumns();
+        int[] utilities = new int[columns.length];
+        int utility = 0;
+
+        for (int x = 0; x < columns.length; x++) {
+            int y = getFreeRow(x);
+            utilities[x] = Math.max(horizontalUtility(x,y),utilities[x]);
+        }
+        for (int i = 0; i < utilities.length; i++)
+            utility += utilities[i];
+        return utility;
     }
+
+    public int horizontalUtility(int x, int y) {
+            int utility = 0;
+            for(Node n : horizontal) {
+            Node tempNode = n;
+            int partUtility = 0;
+            if (playerID == n.playerID && n.y == y){
+            while(true) {
+                if(tempNode.getNext() != null) {
+                    tempNode = tempNode.getNext();
+                    partUtility++;
+                    } else {
+                        if (tempNode.x != x-1)
+                            partUtility = 0;
+                        utility += partUtility;
+                        break;
+                    }
+
+                }
+            }
+        }
+        System.out.println("horizontalUtility x: " + x + ", y: "  + y + " u: " + utility);
+        return utility;
+        }
+    
 
     public void printBoard() {
 
