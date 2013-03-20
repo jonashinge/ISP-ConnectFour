@@ -111,7 +111,7 @@ public class LineHelper {
             
             Node tempNode = columnNode;
             while (true) {
-                if (tempNode.y == row-1 && tempNode.x == column+1 &&tempNode.playerID == playerID) {
+                if (tempNode.y == row-1 && tempNode.x == column+1 && tempNode.playerID == playerID) {
                     tempNode.setNext(n);                        
                     inserted = true;
                     break;

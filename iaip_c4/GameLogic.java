@@ -121,7 +121,7 @@ public class GameLogic implements IGameLogic {
             for(int i = 0; i < columns.length; i++) {
 
                 GameLogic otherPlayer = this.createOther(x,y,min); //Ny spiller
-                otherPlayer.insertCoin(columns[i],max); //Opdater spilleplade 
+                //otherPlayer.insertCoin(columns[i],max); //Opdater spilleplade 
                 
                  currentMin = otherPlayer.minValue();
        
@@ -141,7 +141,7 @@ public class GameLogic implements IGameLogic {
             for(int i = 0; i < columns.length; i++) {
 
                 GameLogic otherPlayer = this.createOther(x,y,max); //Ny spiller
-                otherPlayer.insertCoin(columns[i],min); //Opdater spilleplade 
+                //otherPlayer.insertCoin(columns[i],min); //Opdater spilleplade 
                 
                 currentMax = otherPlayer.maxValue();
    
@@ -172,6 +172,7 @@ public class GameLogic implements IGameLogic {
 
         for(int i : columns) {
             GameLogic otherPlayer = this.createOther(x,y,min); //Ny spiller
+            otherPlayer.insertCoin(i,max); //Opdater spilleplade 
             v = Math.max(otherPlayer.minValue(),v);
         }
     
@@ -188,6 +189,7 @@ public class GameLogic implements IGameLogic {
 
         for(int i : columns) {
             GameLogic otherPlayer = this.createOther(x,y,max); //Ny spiller
+            otherPlayer.insertCoin(i,min); //Opdater spilleplade 
             v = Math.min(otherPlayer.maxValue(),v);
         }
 
