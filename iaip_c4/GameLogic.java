@@ -9,6 +9,8 @@ public class GameLogic implements IGameLogic {
     private int max = 2;
     private int[][] board;
     private int counter;
+    private int alpha;
+    private int beta;
     
     private ArrayList<Node> vertical = new ArrayList<Node>();
     private ArrayList<Node> horizontal = new ArrayList<Node>();
@@ -23,7 +25,7 @@ public class GameLogic implements IGameLogic {
         //TODO Write your implementation for this method
     }
 
-    public GameLogic(int x, int y, int playerID, int[][] board,int counter, ArrayList<Node> vertical,ArrayList<Node> horizontal,ArrayList<Node> rightDiagonal,ArrayList<Node> leftDiagonal) {
+    public GameLogic(int x, int y, int playerID, int[][] board,int counter, ArrayList<Node> vertical,ArrayList<Node> horizontal,ArrayList<Node> rightDiagonal,ArrayList<Node> leftDiagonal,int alpha, int beta) {
         //TODO Write your implementation for this method
         this.x = x;
         this.y = y;
@@ -56,11 +58,14 @@ public class GameLogic implements IGameLogic {
             this.leftDiagonal.add((Node)n.clone());
         }
 
+        this.alpha = alpha;
+        this.beta = beta;
+
     }
     
 
     public GameLogic createOther(int x, int y, int playerID) {
-        return new GameLogic(x,  y, playerID , this.board,this.counter-1, vertical, horizontal,rightDiagonal,leftDiagonal);
+        return new GameLogic(x,  y, playerID , this.board,this.counter-1, vertical, horizontal,rightDiagonal,leftDiagonal, alpha, beta);
     }
 	
     public void initializeGame(int x, int y, int playerID) {
@@ -80,24 +85,6 @@ public class GameLogic implements IGameLogic {
 
         Integer[] columns = getFreeColumns();
 
-        // test print datastructure
-       /* System.out.println("Horizontal:");
-        printDataStructure(horizontal);
-        System.out.println();
-
-        System.out.println("Vertical:");
-        printDataStructure(vertical);
-        System.out.println();
-
-        System.out.println("Right diagonal:");
-        printDataStructure(rightDiagonal);
-        System.out.println();
-
-        System.out.println("Left diagonal:");
-        printDataStructure(leftDiagonal);
-        System.out.println();
-
-        */
         
         for (ArrayList<Node> list : lists ) {
             Winner result = LineHelper.finalLineExistsIn(list);
@@ -183,13 +170,15 @@ public class GameLogic implements IGameLogic {
 
     public int decideNextMove() {
         //TODO Write your implementation for this method
-        counter = 10;
+        counter = 15;
 
         Integer[] columns = getFreeColumns();
         
         int bestAction = -1;
         int currentMin = Integer.MIN_VALUE;
         int currentMax = Integer.MAX_VALUE;
+        alpha = Integer.MIN_VALUE;
+        beta = Integer.MAX_VALUE;
         if (playerID == max) { //PLayer is MAX
             int v = Integer.MIN_VALUE;
             for(int i = 0; i < columns.length; i++) {
@@ -248,8 +237,11 @@ public class GameLogic implements IGameLogic {
             GameLogic otherPlayer = this.createOther(x,y,max); //Ny spiller
             otherPlayer.insertCoin(i,max); //Opdater spilleplade 
             v = Math.max(otherPlayer.minValue(),v);
+            if (v>= beta)
+                return v;
+            alpha = Math.max(alpha,v);
         }
-    
+        System.out.println("alpha " + alpha);
         return v;
 
         }
@@ -265,8 +257,11 @@ public class GameLogic implements IGameLogic {
             GameLogic otherPlayer = this.createOther(x,y,min); //Ny spiller
             otherPlayer.insertCoin(i,min); //Opdater spilleplade 
             v = Math.min(otherPlayer.maxValue(),v);
+            if (v<= alpha)
+                return v;
+            beta = Math.min(beta,v);
         }
-
+        System.out.println("beta " +beta);
         return v;
     }
              
@@ -310,28 +305,7 @@ public class GameLogic implements IGameLogic {
         Integer[] columns = getFreeColumns();
         int[] utilities = new int[columns.length];
         int utility = 0;
-        /*
-        System.out.println();
-        System.out.println("utility");
-         System.out.println("horizontal:");
-        printDataStructure(horizontal);
-        System.out.println();
 
-        System.out.println("Vertical:");
-        printDataStructure(vertical);
-        System.out.println();
-
-        System.out.println("Right diagonal:");
-        printDataStructure(rightDiagonal);
-        System.out.println();
-
-        System.out.println("Left diagonal:");
-        printDataStructure(leftDiagonal);
-        System.out.println();
-         System.out.println("board");
-        printBoard();
-        System.out.println("***");
-        */
         for (int x = 0; x < columns.length; x++) {
             int y = getFreeRow(x);
             utilities[x] += Math.max(horizontalUtility(x,y),utilities[x]);
@@ -342,8 +316,7 @@ public class GameLogic implements IGameLogic {
         }
         for (int i = 0; i < utilities.length; i++)
             utility += utilities[i];
-        //if (utility>0)
-            //System.out.println("utility " + utility + "for playerID "  + playerID);
+
         return utility;
 
 
@@ -359,12 +332,11 @@ public class GameLogic implements IGameLogic {
             if (playerID == n.playerID  && n.y == y){
 
             while(true) {
-               //System.out.println("playerID: " + n.playerID + " partUtility " + partUtility );
-                partUtility++;
                 i++;
+            partUtility = (++partUtility)*(int)Math.pow(2,i);
+                
                 
                 if(tempNode != null) {
-                    //System.out.println(i +": tempNode.x: " + tempNode.x + " x: " + x );
                     result = tempNode;
                     tempNode = tempNode.getNext();
                      
@@ -382,8 +354,6 @@ public class GameLogic implements IGameLogic {
                 }
             }
         }
-        //if (utility > 0)
-        //    System.out.println("horizontalUtility x: " + x + ", y: "  + y + " u: " + utility);
         return utility;
         
         }
@@ -400,10 +370,8 @@ public class GameLogic implements IGameLogic {
             if (playerID == n.playerID  && n.x == x){
 
             while(true) {
-               //System.out.println("playerID: " + n.playerID + " partUtility " + partUtility );
-                partUtility++;
                 i++;
-                
+            partUtility = (++partUtility)*(int)Math.pow(2,i);
                 if(tempNode != null) {
                    
                     result = tempNode;
@@ -438,8 +406,8 @@ public class GameLogic implements IGameLogic {
 
             while(true) {
                
-                partUtility++;
                 i++;
+            partUtility = (++partUtility)*(int)Math.pow(2,i);
                 if(tempNode != null) {
                
                     result = tempNode;
@@ -475,8 +443,8 @@ public class GameLogic implements IGameLogic {
 
             while(true) {
                
-                partUtility++;
                 i++;
+                partUtility = (++partUtility)*(int)Math.pow(2,i);
                 if(tempNode != null) {
                
                     result = tempNode;
