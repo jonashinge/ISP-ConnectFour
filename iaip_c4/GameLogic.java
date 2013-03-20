@@ -77,9 +77,7 @@ public class GameLogic implements IGameLogic {
             System.out.println();
             System.out.println("Game status:");
             System.out.println("NOT FINISHED");
-            /*for (int i : columns) {
-                System.out.print(i +" ");
-            }*/
+            
             return Winner.NOT_FINISHED;
         }
         else {
@@ -93,158 +91,16 @@ public class GameLogic implements IGameLogic {
         
     }
 
-    
-
-
-    public void insertVertical(int column, int row, int playerID) {
-        Node n = new Node(column,row,playerID);
-        boolean inserted = false;
-
-        if ( row == 0 ) {
-            vertical.add(n);
-        } else {
-            for (Node node : vertical) {
-                Node tempNode = node;
-                while (true) {
-                    if (tempNode.playerID == playerID && tempNode.x == column && tempNode.y == row-1) {
-                        tempNode.setNext(n);     
-                        inserted = true;
-                        break;               
-                    }
-                    tempNode = tempNode.getNext();
-                    if(tempNode==null) {
-                        break;
-                    }
-                }
-            }
-            if(inserted==false)
-                vertical.add(n);
-        }
-    }
-
-    public void insertHorizontal(int column,int row, int playerID) {
-        Node n = new Node(column,row,playerID);
-        boolean inserted = false;
-
-        for (Node node : horizontal) {
-            if (node.y == row) {
-                Node tempNode = node;
-                while (true) {
-                    if (tempNode.x == column-1 && tempNode.playerID == playerID) {
-                        System.out.println("setting next node x: " + n.x + " y:" + n.y);
-                        tempNode.setNext(n); 
-                        inserted = true;                  
-                        break;
-                    }
-                    tempNode=tempNode.getNext();
-                    if(tempNode==null) {
-                        break;
-                    }
-                }
-            }
-        }
-
-        if (inserted==false)
-            horizontal.add(n);
-
-
-        Iterator<Node> i = horizontal.iterator();
-        
-
-        while (i.hasNext()) {
-            Node iNode = i.next();
-            if (iNode.y == n.y && iNode.x == n.x+1 && iNode.playerID == playerID) {
-                n.setNext(iNode);
-                i.remove();
-            }
-            }
-        }
-
-        public void insertRightDiagonal(int column,int row, int playerID) {
-        Node n = new Node(column,row,playerID);
-        boolean inserted = false;
-
-        for (Node columnNode : rightDiagonal) {
-            //if (columnNode.x == column - 1) {
-                Node tempNode = columnNode;
-                while (true) {
-                    if (tempNode.y == row-1 && tempNode.x == column-1 && tempNode.playerID == playerID) {
-                        tempNode.setNext(n);                        
-                        inserted = true;
-                        break;
-                    }
-                    tempNode=tempNode.getNext();
-                    if(tempNode==null) {
-                        break;
-                    }
-                }
-            //}
-
-        }
-
-        if(inserted==false)
-            rightDiagonal.add(n);
-        
-
-        Iterator<Node> i = rightDiagonal.iterator();
-        
-
-        while (i.hasNext()) {
-            Node iNode = i.next();
-            if (iNode.y == n.y+1 && iNode.x == n.x+1 && iNode.playerID == playerID) {
-                n.setNext(iNode);
-                i.remove();
-            }
-            }
-    }
-
-     public void insertLeftDiagonal(int column,int row, int playerID) {
-        Node n = new Node(column,row,playerID);
-        boolean inserted = false;
-
-        for (Node columnNode : leftDiagonal) {
-            //if (columnNode.x == column + 1 ) {
-                Node tempNode = columnNode;
-                while (true) {
-                    if (tempNode.y == row-1 && tempNode.x == column+1 &&tempNode.playerID == playerID) {
-                        tempNode.setNext(n);                        
-                        inserted = true;
-                        break;
-                    }
-                    tempNode=tempNode.getNext();
-                    if(tempNode==null)
-                        break;
-                }
-            //}
-
-        }
-
-        if(inserted==false)
-            leftDiagonal.add(n);
-        
-        Iterator<Node> i = rightDiagonal.iterator();
-        
-
-        while (i.hasNext()) {
-            Node iNode = i.next();
-            if (iNode.y == n.y+1 && iNode.x == n.x-1 && iNode.playerID == playerID) {
-                n.setNext(iNode);
-                i.remove();
-            }
-            }
-        
-    }
-
     public void insertCoin(int column, int playerID) {
         //TODO Write your implementation for this method
         int free = getFreeRow(column);
         if(free != -1) {
             board[column][free] = playerID;
-            insertHorizontal(column,free,playerID);
-            insertVertical(column,free,playerID);
-            insertLeftDiagonal(column,free,playerID);
-            insertRightDiagonal(column,free,playerID);
-            //System.out.println("user " + playerID + " inserted at column: " + column + " at row:" + free);
+
+            LineHelper.insertHorizontal(horizontal,column,free,playerID);
+            LineHelper.insertVertical(vertical,column,free,playerID);
+            LineHelper.insertLeftDiagonal(leftDiagonal,column,free,playerID);
+            LineHelper.insertRightDiagonal(rightDiagonal,column,free,playerID);
         }
         else System.out.println("column is full - column: " + column + " row: " + free);
     }
@@ -256,10 +112,7 @@ public class GameLogic implements IGameLogic {
         counter = 10;
 
         Integer[] columns = getFreeColumns();
-        //System.out.println("decideNextMove");
-        //for (int i : columns) {
-        //        System.out.print(i +" ");
-        //    }
+        
         int bestAction = -1;
         int currentMin = Integer.MIN_VALUE;
         int currentMax = Integer.MAX_VALUE;
@@ -267,10 +120,9 @@ public class GameLogic implements IGameLogic {
             int v = Integer.MIN_VALUE;
             for(int i = 0; i < columns.length; i++) {
 
-                //System.out.println("create new object in decideNextMove - MAX");
                 GameLogic otherPlayer = this.createOther(x,y,min); //Ny spiller
                 otherPlayer.insertCoin(columns[i],max); //Opdater spilleplade 
-                //System.out.print("max action: " + columns[i] + " ");
+                
                  currentMin = otherPlayer.minValue();
        
                 if (currentMin > v) {
@@ -288,10 +140,9 @@ public class GameLogic implements IGameLogic {
             int v = Integer.MAX_VALUE;
             for(int i = 0; i < columns.length; i++) {
 
-               //System.out.println("create new object in decideNextMove - MIN");
                 GameLogic otherPlayer = this.createOther(x,y,max); //Ny spiller
                 otherPlayer.insertCoin(columns[i],min); //Opdater spilleplade 
-                //System.out.print("min action: " + columns[i] + " ");
+                
                 currentMax = otherPlayer.maxValue();
    
                 if (currentMax < v) {
@@ -317,17 +168,10 @@ public class GameLogic implements IGameLogic {
     public int maxValue() {
         if (terminalTest()) return utility();
         Integer[] columns = getFreeColumns();
-        //System.out.print("maxValue ");
-        //for (int i : columns) {
-        //       System.out.print(i +" ");
-        //   }
-        //System.out.println(".");
         int v = Integer.MIN_VALUE;
 
         for(int i : columns) {
-            //System.out.println("create new object in maxValue");
             GameLogic otherPlayer = this.createOther(x,y,min); //Ny spiller
-            //otherPlayer.insertCoin(i,max); //Opdater spilleplade 
             v = Math.max(otherPlayer.minValue(),v);
         }
     
@@ -340,17 +184,10 @@ public class GameLogic implements IGameLogic {
         if (terminalTest()) return utility();
 
         Integer[] columns = getFreeColumns();
-        //System.out.print("minValue ");
-        //for (int i : columns) {
-        //        System.out.print(i +" ");
-        //    }
-        //System.out.println(".");
         int v = Integer.MAX_VALUE;
 
         for(int i : columns) {
-            //System.out.println("create new object in minValue");
             GameLogic otherPlayer = this.createOther(x,y,max); //Ny spiller
-            //otherPlayer.insertCoin(i,min); //Opdater spilleplade 
             v = Math.min(otherPlayer.maxValue(),v);
         }
 
@@ -384,8 +221,6 @@ public class GameLogic implements IGameLogic {
             return true;
         
         if (counter <= 0) {
-            //System.out.println("terminated.");
-            //printBoard();
             return true;
         }
         else return false;
