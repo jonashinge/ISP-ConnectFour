@@ -22,9 +22,12 @@ public class GameLogic implements IGameLogic {
 
 
     public GameLogic() {
-        //TODO Write your implementation for this method
+        
     }
 
+    /**
+    * Constructor used to create a new 
+    **/
     public GameLogic(int x, int y, int playerID, int[][] board,int counter, ArrayList<Node> vertical,ArrayList<Node> horizontal,ArrayList<Node> rightDiagonal,ArrayList<Node> leftDiagonal,int alpha, int beta) {
         //TODO Write your implementation for this method
         this.x = x;
@@ -119,37 +122,7 @@ public class GameLogic implements IGameLogic {
 
 
 
-        /*
-        if(LineHelper.finalLineExistsIn(horizontal) ||
-                LineHelper.finalLineExistsIn(vertical) ||
-                LineHelper.finalLineExistsIn(rightDiagonal) ||
-                LineHelper.finalLineExistsIn(leftDiagonal)) {
-
-            System.out.println();
-            printBoard();
-            System.out.println();
-            System.out.println("Game status:");
-            System.out.println("WINNER");
-            return Winner.PLAYER1;
-
-        }
-        else if(columns != null && columns.length>0) {
-            printBoard();
-            System.out.println();
-            System.out.println("Game status:");
-            System.out.println("NOT FINISHED");
-            
-            return Winner.NOT_FINISHED;
-        }
-        else {
-            System.out.println();
-            printBoard();
-            System.out.println();
-            System.out.println("Game status:");
-            System.out.println("TIE");
-            return Winner.TIE;
-        }
-        */
+        
     }
 
     public void insertCoin(int column, int playerID) {
@@ -170,7 +143,7 @@ public class GameLogic implements IGameLogic {
 
     public int decideNextMove() {
         //TODO Write your implementation for this method
-        counter = 15;
+        counter = 8;
 
         Integer[] columns = getFreeColumns();
         
@@ -191,11 +164,11 @@ public class GameLogic implements IGameLogic {
                 if (currentMin > v) {
                     v = currentMin;
                     bestAction = columns[i];
-                }  /* else if (currentMin == v && Math.random() >=0.5d) {
+                }   else if (currentMin == v && Math.random() >=0.5d) {
                     v = currentMin;
                     bestAction = columns[i];
 
-                }*/
+                }
 
             }
         System.out.println();
@@ -211,19 +184,15 @@ public class GameLogic implements IGameLogic {
                 if (currentMax < v) {
                     v = currentMax;
                     bestAction = columns[i];
-                } /*else if (currentMax == v && Math.random() >=0.5d) {
+                } else if (currentMax == v && Math.random() >=0.5d) {
                     v = currentMax;
                     bestAction = columns[i];
 
-                }*/
+                }
 
             }
         
         }
-        if (bestAction <0)
-            System.out.println("FEJL!!!");
-        System.out.println("decideNextMove bestAction is " + bestAction);
-        System.out.println();
         return bestAction;
     }
 
@@ -234,14 +203,13 @@ public class GameLogic implements IGameLogic {
         int v = Integer.MIN_VALUE;
 
         for(int i : columns) {
-            GameLogic otherPlayer = this.createOther(x,y,max); //Ny spiller
-            otherPlayer.insertCoin(i,max); //Opdater spilleplade 
+            GameLogic otherPlayer = this.createOther(x,y,max); //New Player
+            otherPlayer.insertCoin(i,max); //Update board
             v = Math.max(otherPlayer.minValue(),v);
             if (v>= beta)
                 return v;
             alpha = Math.max(alpha,v);
-        }
-        System.out.println("alpha " + alpha);
+        }        
         return v;
 
         }
@@ -254,14 +222,13 @@ public class GameLogic implements IGameLogic {
         int v = Integer.MAX_VALUE;
 
         for(int i : columns) {
-            GameLogic otherPlayer = this.createOther(x,y,min); //Ny spiller
-            otherPlayer.insertCoin(i,min); //Opdater spilleplade 
+            GameLogic otherPlayer = this.createOther(x,y,min); //New Player
+            otherPlayer.insertCoin(i,min); //Update Board
             v = Math.min(otherPlayer.maxValue(),v);
             if (v<= alpha)
                 return v;
             beta = Math.min(beta,v);
         }
-        System.out.println("beta " +beta);
         return v;
     }
              
@@ -286,7 +253,6 @@ public class GameLogic implements IGameLogic {
     }
 
     public boolean terminalTest() {
-        counter -= 1;
 
         if (counter <= 0) {
             return true;
@@ -300,19 +266,17 @@ public class GameLogic implements IGameLogic {
 
     public int utility() {
         
-        /*System.out.println(playerID);
-        return 1;*/
+
         Integer[] columns = getFreeColumns();
         int[] utilities = new int[columns.length];
         int utility = 0;
 
         for (int x = 0; x < columns.length; x++) {
             int y = getFreeRow(x);
-            utilities[x] += Math.max(horizontalUtility(x,y),utilities[x]);
-            utilities[x] += Math.max(verticalUtility(x,y),utilities[x]);
-            utilities[x] += Math.max(rightDiagonalUtility(x,y),utilities[x]);
-            utilities[x] += Math.max(leftDiagonalUtility(x,y),utilities[x]);
-            //System.out.println("utilities[" + x + "] : " + utilities[x]  );
+            utilities[x] += horizontalUtility(x,y);
+            utilities[x] += verticalUtility(x,y);
+            utilities[x] += rightDiagonalUtility(x,y);
+            utilities[x] += leftDiagonalUtility(x,y);
         }
         for (int i = 0; i < utilities.length; i++)
             utility += utilities[i];
@@ -334,19 +298,13 @@ public class GameLogic implements IGameLogic {
             while(true) {
                 i++;
             partUtility = (++partUtility)*(int)Math.pow(2,i);
-                
-                
                 if(tempNode != null) {
                     result = tempNode;
                     tempNode = tempNode.getNext();
                      
                     } else {
-                        
-                        
                         if (result.x != x-1)
                             partUtility = 0;
-                            
-
                         utility += partUtility;
                         break;
                     }
