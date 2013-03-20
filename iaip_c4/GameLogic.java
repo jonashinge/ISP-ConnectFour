@@ -161,7 +161,7 @@ public class GameLogic implements IGameLogic {
         boolean inserted = false;
 
         for (Node columnNode : rightDiagonal) {
-            if (columnNode.x == column - 1) {
+            //if (columnNode.x == column - 1) {
                 Node tempNode = columnNode;
                 while (true) {
                     if (tempNode.y == row-1 && tempNode.x == column-1 && tempNode.playerID == playerID) {
@@ -174,7 +174,7 @@ public class GameLogic implements IGameLogic {
                         break;
                     }
                 }
-            }
+            //}
 
         }
 
